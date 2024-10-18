@@ -9,7 +9,7 @@ app.secret_key = "your_secret_key"
 db_config = {
     'host': 'localhost',
     'user': 'root',
-    'password': 'your_mysql_password',
+    'password': '1122',
     'db': 'flask_crud',
     'cursorclass': pymysql.cursors.DictCursor  # Ensures results are returned as dictionaries
 }
