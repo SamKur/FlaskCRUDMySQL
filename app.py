@@ -47,18 +47,20 @@ def add_user():
         email = request.form['email']
         age = request.form['age']
         
+        errors = []  # List to hold error messages
+        
         # Validation checks
         if not is_valid_name(name):
-            flash('Invalid name. Please enter a valid name.')
-            return redirect(url_for('add_user'))
+            errors.append('Invalid name. Please enter a valid name.')
         
         if not is_valid_email(email):
-            flash('Invalid email address. Please enter a valid email.')
-            return redirect(url_for('add_user'))
+            errors.append('Invalid email address. Please enter a valid email.')
 
         if not is_valid_age(age):
-            flash('Invalid age. Please enter a valid age between 0 and 120.')
-            return redirect(url_for('add_user'))
+            errors.append('Invalid age. Please enter a valid age between 0 and 120.')
+
+        if errors:
+            return render_template('add_user.html', errors=errors, name=name, email=email, age=age)
 
         connection = pymysql.connect(**db_config)
         try:
@@ -66,9 +68,12 @@ def add_user():
                 cur.execute("INSERT INTO users (name, email, age) VALUES (%s, %s, %s)", (name, email, age))
             connection.commit()
             flash('User added successfully!')
+            return redirect(url_for('index'))
+        except pymysql.err.IntegrityError:
+            flash('Email already exists. Please use a different email.')
         finally:
             connection.close()
-        return redirect(url_for('index'))
+        
     return render_template('add_user.html')
 
 # Route to edit a user (dynamic route)
@@ -81,29 +86,43 @@ def edit_user(id):
             email = request.form['email']
             age = request.form['age']
             
+            errors = []  # List to hold error messages
+            
             # Validation checks
             if not is_valid_name(name):
-                flash('Invalid name. Please enter a valid name.')
-                return redirect(url_for('edit_user', id=id))
-
+                errors.append('Invalid name. Please enter a valid name.')
+            
             if not is_valid_email(email):
-                flash('Invalid email address. Please enter a valid email.')
-                return redirect(url_for('edit_user', id=id))
+                errors.append('Invalid email address. Please enter a valid email.')
 
             if not is_valid_age(age):
-                flash('Invalid age. Please enter a valid age between 0 and 120.')
-                return redirect(url_for('edit_user', id=id))
+                errors.append('Invalid age. Please enter a valid age between 0 and 120.')
 
-            with connection.cursor() as cur:
-                cur.execute("""
-                    UPDATE users
-                    SET name = %s, email = %s, age = %s
-                    WHERE id = %s
-                """, (name, email, age, id))
-            connection.commit()
-            flash('User updated successfully!')
-            return redirect(url_for('index'))
-        
+            if errors:
+                # Fetch the existing user data to prefill the form
+                with connection.cursor() as cur:
+                    cur.execute("SELECT * FROM users WHERE id = %s", [id])
+                    user = cur.fetchone()
+                return render_template('edit.html', user=user, errors=errors)
+
+            try:
+                with connection.cursor() as cur:
+                    cur.execute("""
+                        UPDATE users
+                        SET name = %s, email = %s, age = %s
+                        WHERE id = %s
+                    """, (name, email, age, id))
+                connection.commit()
+                flash('User updated successfully!')
+                return redirect(url_for('index'))
+            except pymysql.err.IntegrityError:
+                flash('Email already exists. Please use a different email.')
+                # Fetch the existing user data to prefill the form
+                with connection.cursor() as cur:
+                    cur.execute("SELECT * FROM users WHERE id = %s", [id])
+                    user = cur.fetchone()
+                return render_template('edit.html', user=user, errors=['Email already exists. Please use a different email.'])
+
         # Fetch existing user data
         with connection.cursor() as cur:
             cur.execute("SELECT * FROM users WHERE id = %s", [id])

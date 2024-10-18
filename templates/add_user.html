@@ -1,24 +1,35 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add User</title>
 </head>
 <body>
-    <h1>Add New User</h1>
-    <form action="{{ url_for('add_user') }}" method="POST">
-        <label for="name">Name:</label><br>
-        <input type="text" id="name" name="name" required placeholder="Enter your name"><br><br>
-
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" required placeholder="Enter your email"><br><br>
-
-        <label for="age">Age:</label><br>
-        <input type="number" id="age" name="age" required placeholder="Enter your age"><br><br>
-
-        <input type="submit" value="Add User">
+    <h1>Add User</h1>
+    <!-- Display Error Messages -->
+    {% if errors %}
+        <ul>
+            {% for error in errors %}
+                <li style="color: red;">{{ error }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    <form action="/add_user" method="POST">
+        <label for="name">Name:</label>
+        <input type="text" name="name" value="{{ name }}" required>
+        <br>
+        
+        <label for="email">Email:</label>
+        <input type="email" name="email" value="{{ email }}" required>
+        <br>
+        
+        <label for="age">Age:</label>
+        <input type="number" name="age" value="{{ age }}" required>
+        <br>
+        
+        <button type="submit">Add User</button>
     </form>
-
-    <br>
-    <a href="{{ url_for('index') }}">Back to User List</a>
+    <a href="/">Back to Home</a>
 </body>
 </html>
