@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import pymysql
+import re
 
 # Initialize the Flask app
 app = Flask(__name__)
@@ -26,6 +27,18 @@ def index():
     finally:
         connection.close()
 
+# Function to validate name
+def is_valid_name(name):
+    return name and name.replace(" ", "").isalpha()
+
+# Function to validate email
+def is_valid_email(email):
+    return re.match(r'^[\w\.-]+@[\w\.-]+\.\w+$', email)
+
+# Function to validate age
+def is_valid_age(age):
+    return age.isdigit() and 0 <= int(age) <= 120
+
 # Route to render add user form and process the user addition
 @app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
@@ -34,6 +47,19 @@ def add_user():
         email = request.form['email']
         age = request.form['age']
         
+        # Validation checks
+        if not is_valid_name(name):
+            flash('Invalid name. Please enter a valid name.')
+            return redirect(url_for('add_user'))
+        
+        if not is_valid_email(email):
+            flash('Invalid email address. Please enter a valid email.')
+            return redirect(url_for('add_user'))
+
+        if not is_valid_age(age):
+            flash('Invalid age. Please enter a valid age between 0 and 120.')
+            return redirect(url_for('add_user'))
+
         connection = pymysql.connect(**db_config)
         try:
             with connection.cursor() as cur:
@@ -55,6 +81,19 @@ def edit_user(id):
             email = request.form['email']
             age = request.form['age']
             
+            # Validation checks
+            if not is_valid_name(name):
+                flash('Invalid name. Please enter a valid name.')
+                return redirect(url_for('edit_user', id=id))
+
+            if not is_valid_email(email):
+                flash('Invalid email address. Please enter a valid email.')
+                return redirect(url_for('edit_user', id=id))
+
+            if not is_valid_age(age):
+                flash('Invalid age. Please enter a valid age between 0 and 120.')
+                return redirect(url_for('edit_user', id=id))
+
             with connection.cursor() as cur:
                 cur.execute("""
                     UPDATE users
