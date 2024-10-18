@@ -1,0 +1,21 @@
+# Virtual environment
+venv/
+flaskenv_py/
+
+# Python cache files
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment variables
+.env
+
+# Database (if using SQLite)
+*.db
+
+# Log files
+*.log
+
+# IDE-specific files (Optional, based on your IDE)
+.vscode/
+.idea/
