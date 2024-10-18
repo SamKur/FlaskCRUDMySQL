@@ -26,8 +26,8 @@ def index():
     finally:
         connection.close()
 
-# Route to add a new user
-@app.route('/add_user', methods=['POST'])
+# Route to render add user form and process the user addition
+@app.route('/add_user', methods=['GET', 'POST'])
 def add_user():
     if request.method == 'POST':
         name = request.form['name']
@@ -43,6 +43,7 @@ def add_user():
         finally:
             connection.close()
         return redirect(url_for('index'))
+    return render_template('add_user.html')
 
 # Route to edit a user (dynamic route)
 @app.route('/edit/<id>', methods=['GET', 'POST'])
