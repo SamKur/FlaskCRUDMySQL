@@ -144,6 +144,6 @@ def delete_user(id):
         connection.close()
     return redirect(url_for('index'))
 
-# Run the app
+# Run the app #first run sql file, then by `python app.py`
 if __name__ == "__main__":
     app.run(debug=True)
