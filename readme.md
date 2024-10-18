@@ -1,4 +1,6 @@
 # 🌟 Flask CRUD Application
+![Thumbnail](show.png)
+
 ---
 ### Created by **Susamay Kumbhakar**
 📧 **Email**: [susamay.sk@gmail.com](mailto:susamay.sk@gmail.com)
